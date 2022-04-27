@@ -33,10 +33,10 @@ h1 {
 }
 
 .container {
-    height: 900px;
-    width: 900px;
+    height: 800px;
+    width: 1600px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(4, 1fr);
     grid-gap: 1em;
 }
@@ -62,8 +62,8 @@ h1 {
 }
 
 .card img {
-    max-height: 90%;
-    max-width: 90%;
+    max-height: 95%;
+    max-width: 95%;
     transition: transform 0.5s;
     transform: scale(0);
     animation: 2s hideImage linear;

@@ -6,7 +6,7 @@ import { shuffle } from "../utils";
 const Cards = () => {
   const [items, setItems] = useState(ItemList);
   const [prevIndex, setPrevIndex] = useState(-1);
-  const [timeoutId, setTimeoutId] = useState(null);
+  const [preventClick, setPreventClick] = useState(false);
 
   useEffect(() => {
     const newItems = [...items];
@@ -22,6 +22,7 @@ const Cards = () => {
       newItems[prevIndex].status = ITEM_STATUS.CORRECT;
       setItems(newItems);
       setPrevIndex(-1);
+      setPreventClick(false);
     } else {
       // It's not a Match
       const newItems = [...items];
@@ -35,23 +36,27 @@ const Cards = () => {
   }
 
   const reset = (currentIndex) => {
-    clearTimeout(timeoutId);
-    const _timeoutId = setTimeout(() => {
+    setTimeout(() => {
       const newItems = [...items];
       newItems[currentIndex].status = '';
       newItems[prevIndex].status = '';
       setItems(newItems);
+      setPreventClick(false);
     }, 1000);
-    setTimeoutId(_timeoutId);
   }
 
   const handleClick = (id) => {
+    if (preventClick || items[id].status === ITEM_STATUS.CORRECT) {
+      return;
+    }
+
     if(prevIndex === -1) {
       const newItems = [...items];
       newItems[id].status = ITEM_STATUS.ACTIVE;
       setItems(newItems);
       setPrevIndex(id);
     } else {
+      setPreventClick(true);
      check(id);
     }
   }
