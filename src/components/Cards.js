@@ -6,14 +6,16 @@ import { shuffle } from "../utils";
 const Cards = () => {
   const [items, setItems] = useState(ItemList);
   const [prevIndex, setPrevIndex] = useState(-1);
-  const [timeoutIId, setTimeoutId] = useState(null);
+  const [timeoutId, setTimeoutId] = useState(null);
 
   useEffect(() => {
-    setItems((oldItems) => shuffle(oldItems));
+    const newItems = [...items];
+    shuffle(newItems);
+    setItems(newItems);
   }, []);
 
   const check = (currentIndex) => {
-    if(items[currentIndex].id === items[prevIndex].id) {
+    if(items[currentIndex].number === items[prevIndex].number) {
       // It's a Match
       const newItems = [...items];
       newItems[currentIndex].status = ITEM_STATUS.CORRECT;
@@ -33,7 +35,7 @@ const Cards = () => {
   }
 
   const reset = (currentIndex) => {
-    clearTimeout(timeoutIId);
+    clearTimeout(timeoutId);
     const _timeoutId = setTimeout(() => {
       const newItems = [...items];
       newItems[currentIndex].status = '';
@@ -45,10 +47,9 @@ const Cards = () => {
 
   const handleClick = (id) => {
     if(prevIndex === -1) {
-      setItems((oldItems) => {
-        oldItems[id].status = ITEM_STATUS.ACTIVE;
-        return oldItems;
-      });
+      const newItems = [...items];
+      newItems[id].status = ITEM_STATUS.ACTIVE;
+      setItems(newItems);
       setPrevIndex(id);
     } else {
      check(id);
@@ -57,9 +58,11 @@ const Cards = () => {
   
     return (
       <div className={'container'}>
-        {items.map((item, index) => (
-          <Card key={index} item={item} id={index} handleClick={handleClick}/>
-        ))}
+        {items.map((item, index) => {
+          return (
+            <Card key={item.id} item={item} id={index} handleClick={handleClick}/>
+          )
+        } )}
       </div>
     )
 };
