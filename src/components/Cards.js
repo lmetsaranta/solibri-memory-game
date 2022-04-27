@@ -1,45 +1,60 @@
 import {useEffect, useState} from 'react';
-import { ItemList } from '../itemList';
+import { ItemList, ITEM_STATUS } from '../data/itemList';
 import Card from './Card';
+import { shuffle } from "../utils";
 
 const Cards = () => {
   const [items, setItems] = useState(ItemList);
-  const [prev, setPrev] = useState(-1);
+  const [prevIndex, setPrevIndex] = useState(-1);
+  const [timeoutIId, setTimeoutId] = useState(null);
 
   useEffect(() => {
-    items.sort(() => Math.random() - 0.5)
-    setItems([...items]);
+    setItems((oldItems) => shuffle(oldItems));
   }, []);
 
-  const check = (current) => {
-    if(items[current].id === items[prev].id) {
-      items[current].status = 'correct';
-      items[prev].status = 'correct';
-      setItems([...items]);
-      setPrev(-1)
+  const check = (currentIndex) => {
+    if(items[currentIndex].id === items[prevIndex].id) {
+      // It's a Match
+      const newItems = [...items];
+      newItems[currentIndex].status = ITEM_STATUS.CORRECT;
+      newItems[prevIndex].status = ITEM_STATUS.CORRECT;
+      setItems(newItems);
+      setPrevIndex(-1);
     } else {
-      items[current].status = 'wrong';
-      items[prev].status = 'wrong';
-      setItems([...items]);
-      setPrev(-1);
-      setTimeout(() => {
-        items[current].status = '';
-        items[prev].status = '';
-        setItems([...items]);
-      }, 1000);
+      // It's not a Match
+      const newItems = [...items];
+      newItems[currentIndex].status = ITEM_STATUS.WRONG;
+      newItems[prevIndex].status = ITEM_STATUS.WRONG;
+      setItems(newItems);
+      setPrevIndex(-1);
+
+      reset(currentIndex);
     }
   }
 
-  const handleClick =(id) => {
-    if(prev === -1) {
-      items[id].status = 'active';
-      setItems([...items]);
-      setPrev(id);
+  const reset = (currentIndex) => {
+    clearTimeout(timeoutIId);
+    const _timeoutId = setTimeout(() => {
+      const newItems = [...items];
+      newItems[currentIndex].status = '';
+      newItems[prevIndex].status = '';
+      setItems(newItems);
+    }, 1000);
+    setTimeoutId(_timeoutId);
+  }
+
+  const handleClick = (id) => {
+    if(prevIndex === -1) {
+      setItems((oldItems) => {
+        oldItems[id].status = ITEM_STATUS.ACTIVE;
+        return oldItems;
+      });
+      setPrevIndex(id);
     } else {
      check(id);
     }
   }
-
+  
     return (
       <div className={'container'}>
         {items.map((item, index) => (
